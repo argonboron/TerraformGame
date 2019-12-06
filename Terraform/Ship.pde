@@ -1,64 +1,75 @@
 public class Ship { //<>//
   PVector acceleration, velocity, position, gravity, drag, origin, force, blast, thrust;
   PShape ship;
-  float invMass, orientation;
-  boolean pause;
+  float mass, orientation, orbitAngle;
+  boolean pause, inOrbit, clockwise;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
+  Planet orbitPlanet;
 
-  void display() {
-    //if (!exploded && (position.x > -5 && position.x < displayWidth+5)) {
-    //ship.rotate(0.1);
-
-    //ship = createShape(TRIANGLE, 0, -15, -10, 15, 10, 15);
-    //ship.setFill(color(260, 100, 40));
-    ////ship.translate(10, 15);
-    //ship.rotate(orientation);
-    //ship.translate(position.x, position.y);
-    //shape(ship);
-    if (!pause) {
+  void display() {  
+    if (!pause && !inOrbit) {
       integrate();
+      orbitAngle = 0;
     }
-
-    push();
-    rectMode(CENTER);
-    //translate(0,0);
-    translate(position.x, position.y);
-    rotate(orientation);
-    square(0, 0, 15);
-    pop();
     PVector lineCoord = position.copy();
-    lineCoords.add(lineCoord);
+    if (lineCoords.size()>200) {
+      lineCoords.remove(0);
+    }
+    if (!pause && ((int) random(0, 2)==1)) {
+      lineCoords.add(lineCoord);
+    }
     for (int i = 0; i < lineCoords.size(); i++) {
       if (i > 0) {
         stroke(255);
         fill(255);
-        line(lineCoords.get(i-1).x, lineCoords.get(i-1).y, lineCoords.get(i).x, lineCoords.get(i).y);
+        //line(lineCoords.get(i-1).x, lineCoords.get(i-1).y, lineCoords.get(i).x, lineCoords.get(i).y);
         stroke(0);
       }
     }
-
-    // println(position.x + " #|" + position.y);
+    push();
+    rectMode(CENTER);
+    translate(position.x, position.y);
+    rotate(orientation);
+    fill(260, 100, 40);
+    square(0, 0, 15);
+    pop();
+    fill(0);
   }
 
   public void pause(boolean val) {
     pause = val;
   }
 
-  public Ship() {
-    this.position = new PVector(displayHeight/2, displayHeight/2+300);
-    this.velocity = new PVector();
-    this.acceleration = new PVector();
-    this.thrust = new PVector();
-    this.force = new PVector();
-    gravity = new PVector();
-    invMass = 0.1;
+  public void orbit(float radius, PVector planetPos) {
+    if (!pause) {
+      if (position.y > planetPos.y) {
+        clockwise = (velocity.x < 0);
+      } else {
+        clockwise = (velocity.x > 0);
+      }
+      float angle = atan2(planetPos.x - position.x, planetPos.y - position.y);
+      position = new PVector(planetPos.x+cos(angle)*radius, planetPos.y+sin(angle)*radius);
+      orbitAngle = angle;
+    }
+  }
+
+  public void continueOrbit(float radius, PVector planetPos) {
+    if (!pause) {
+      position = new PVector(planetPos.x+cos(orbitAngle)*radius, planetPos.y+sin(orbitAngle)*radius);
+      orientation = orbitAngle;
+      if (clockwise) {
+        orbitAngle += PI/160;
+      } else {
+        orbitAngle -= PI/160;
+      }
+    }
   }
 
   void applyGravity(Planet planet) {
     if (!pause) {
       PVector distanceVec = planet.position.copy().sub(position);
-      float G = 1;
-      float gravForce = (G * planet.size * getMass()) / (pow(distanceVec.mag(), 3));
+      float G = 100;
+      float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 3));
       gravity.add(distanceVec.mult(gravForce));
     }
   }
@@ -72,16 +83,17 @@ public class Ship { //<>//
     orientation = heading;
   }
 
+
   ////Integrate function
   void integrate() {
     velocity.add(acceleration);
-    velocity.div(10);
+    velocity.div(7);
     position.add(velocity);
     orientation = velocity.heading();
 
-    //Calculate resultant acceleration = force/mass
     force.add(gravity);
-    acceleration = force.copy().div(getMass());
+    gravity = new PVector();
+    acceleration = force.copy().div(mass);
   }
 
   void launch(PVector dragVec) {
@@ -90,13 +102,18 @@ public class Ship { //<>//
     gravity = new PVector();
   }
 
-  ////Calculate mass as 1/inverse mass
-  float getMass() {
-    return 1/invMass;
-  }
-
   ////Getter for Position
   PVector getPosition() {
     return position;
+  }
+
+  public Ship() {
+    this.position = new PVector(displayHeight/2, displayHeight/2+300);
+    this.velocity = new PVector();
+    this.acceleration = new PVector();
+    this.thrust = new PVector();
+    this.force = new PVector();
+    gravity = new PVector();
+    mass = 10;
   }
 }
