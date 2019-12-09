@@ -18,14 +18,6 @@ public class Ship { //<>//
     if (!pause && ((int) random(0, 2)==1)) {
       lineCoords.add(lineCoord);
     }
-    for (int i = 0; i < lineCoords.size(); i++) {
-      if (i > 0) {
-        stroke(255);
-        fill(255);
-        //line(lineCoords.get(i-1).x, lineCoords.get(i-1).y, lineCoords.get(i).x, lineCoords.get(i).y);
-        stroke(0);
-      }
-    }
     push();
     rectMode(CENTER);
     translate(position.x, position.y);
@@ -66,12 +58,10 @@ public class Ship { //<>//
   }
 
   void applyGravity(Planet planet) {
-    if (!pause) {
-      PVector distanceVec = planet.position.copy().sub(position);
-      float G = 100;
-      float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 3));
-      gravity.add(distanceVec.mult(gravForce));
-    }
+    PVector distanceVec = planet.position.copy().sub(position);
+    float G = 100;
+    float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 2));
+    gravity.add(distanceVec.mult(gravForce));
   }
 
   //Setter for velocity
@@ -87,14 +77,14 @@ public class Ship { //<>//
   ////Integrate function
   void integrate() {
     velocity.add(acceleration);
-    velocity.div(7);
+    velocity.normalize();
     position.add(velocity);
     orientation = velocity.heading();
-
     force.add(gravity);
     gravity = new PVector();
     acceleration = force.copy().div(mass);
   }
+
 
   void launch(PVector dragVec) {
     PVector thrust = position.copy().sub(dragVec);

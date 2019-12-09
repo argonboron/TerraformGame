@@ -1,29 +1,26 @@
 public class Projection {
-  PVector acceleration, velocity, position, gravity, drag, force, thrust;
-  PShape Projection;
-  float mass;
-  boolean pause;
+  Ship invisShip;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
 
   void display(ArrayList<Planet> planets, PVector potential) {
-    this.position = ship.position.copy();
-    this.velocity = ship.velocity.copy();
-    this.acceleration = ship.acceleration.copy();
-    this.thrust = ship.thrust.copy();
-    this.force = ship.force.copy();
-    gravity = ship.gravity.copy();
+    invisShip.position = ship.position.copy();
+    invisShip.velocity = ship.velocity.copy();
+    invisShip.acceleration = ship.acceleration.copy();
+    invisShip.thrust = ship.thrust.copy();
+    invisShip.force = ship.force.copy();
+    invisShip.gravity = ship.gravity.copy();
     lineCoords.clear();
-    launch(potential);
-  outer: for (int j = 0; j < (abs(potential.mag()-1000))*4; j++) {
+    invisShip.launch(potential);
+  outer: for (int j = 0; j < (abs(potential.mag()-1000))*9; j++) {
       for (Planet planet : planets) {
-        applyGravity(planet);
-        if (planet.position.dist(this.position) < planet.size/2) {
+        invisShip.applyGravity(planet);
+        if (planet.position.dist(invisShip.position) < planet.size/2) {
           break outer;
         }
       }
-      PVector lineCoord = this.position.copy();
+      PVector lineCoord = invisShip.position.copy();
       lineCoords.add(lineCoord);
-      integrate();
+      invisShip.integrate();
     }
     for (int i = 0; i < lineCoords.size(); i++) {
       if (i > 0) {
@@ -35,40 +32,14 @@ public class Projection {
     }
   }
 
-  void launch(PVector dragVec) {
-    PVector thrust = position.copy().sub(dragVec);
-    force = thrust;
-    gravity = new PVector();
-  }
-
-  void applyGravity(Planet planet) {
-    if (!pause) {
-      PVector distanceVec = planet.position.copy().sub(position);
-      float G = 100;
-      float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 3));
-      gravity.add(distanceVec.mult(gravForce));
-    }
-  }
-
-  ////Integrate function
-  void integrate() {
-    velocity.add(acceleration);
-    velocity.div(10);
-    position.add(velocity);
-
-    //Calculate resultant acceleration = force/mass
-    force.add(gravity);
-    gravity = new PVector();
-    acceleration = force.copy().div(mass);
-  }
-
   public Projection() {
-    this.position = ship.position.copy();
-    this.velocity = ship.velocity.copy();
-    this.acceleration = ship.acceleration.copy();
-    this.thrust = ship.thrust.copy();
-    this.force = ship.force.copy();
-    gravity = ship.gravity.copy();
-    mass = 10;
+    invisShip = new Ship();
+    invisShip.mass = ship.mass;
+    invisShip.position = ship.position.copy();
+    invisShip.velocity = ship.velocity.copy();
+    invisShip.acceleration = ship.acceleration.copy();
+    invisShip.thrust = ship.thrust.copy();
+    invisShip.force = ship.force.copy();
+    invisShip.gravity = ship.gravity.copy();
   }
 }

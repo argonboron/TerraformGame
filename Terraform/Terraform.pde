@@ -14,7 +14,7 @@ public void setup() {
   background(0);
   ship = new Ship();
   project = new Projection();
-  planets.add(new Planet(1));
+  //planets.add(new Planet(1));
   planets.add(new Planet(2));
   gameOver = false;
   orbitCount = 0;
@@ -33,10 +33,10 @@ public void draw() {
       if (!ship.inOrbit) {
         if ((planets.get(i).position.dist(ship.position) < planets.get(i).orbitDiameter) && !drag) {
           if (orbitCount >100) {
-            ship.orbitPlanet = planets.get(i);
-            ship.inOrbit = true;
-            planets.get(i).beingOrbited = true;
-            ship.orbit(planets.get(i).size*1.1, planets.get(i).position);
+            //ship.orbitPlanet = planets.get(i);
+            //ship.inOrbit = true;
+            //planets.get(i).beingOrbited = true;
+            //ship.orbit(planets.get(i).size*1.1, planets.get(i).position);
           } else {
             orbitCount++;
           }

@@ -5,7 +5,7 @@ public class Planet {
 
   boolean display() {
     if (!ship.pause) {
-      position.add(0, 0.1);
+      //position.add(0, 0.1);
     }
     if (beingOrbited) {
       lifeForce++;
@@ -41,7 +41,7 @@ public class Planet {
       size = 100;
     }
     lifeForce = 0;
-    mass = size/2 + size/3;
+    mass = size / 10;
     orbitDiameter = size*2;
     gravitationalPull = (size*2);
   }
