@@ -4,9 +4,10 @@ ArrayList<Planet> planets = new ArrayList<Planet>();
 Ship ship;
 Projection project;
 int level, speed, orbitCount;
-boolean gameOver, battle, drag, orbit;
+boolean gameOver, battle, drag, orbit, launch;
 PVector dragPos, dragDiff, dragOrigin;
 PShape line;
+PImage bg;
 int DisplayHeight = 1000;
 
 
@@ -24,10 +25,11 @@ public void setup() {
   dragDiff = new PVector(ship.position.x, ship.position.y);
   dragPos = new PVector(ship.position.x, ship.position.y);
   drag = false;
+  bg = loadImage("background.png");
 }
 
 public void draw() {
-  background(50);
+  background(bg);
   if (!gameOver) {
     for (int i = 0; i < planets.size(); i++) {
       planets.get(i).display();
@@ -72,31 +74,55 @@ public void draw() {
 }
 
 public void mousePressed() {
-  drag = true;
-  ship.pause(true);
-  PVector currentDrag = new PVector(mouseX, mouseY);
-  dragDiff = currentDrag.copy().sub(ship.position);
-  dragPos = ship.position.copy().add(dragDiff);
-  ship.turnShip(ship.position.heading()+dragDiff.heading());
-  if (ship.inOrbit) {
-    ship.inOrbit = false;
-    ship.orbitPlanet.beingOrbited = false;
-    ship.orbitPlanet = null;
+  if (launch){
+    drag = true;
+    ship.pause(true);
+    PVector currentDrag = new PVector(mouseX, mouseY);
+    dragDiff = currentDrag.copy().sub(ship.position);
+    dragPos = ship.position.copy().add(dragDiff);
+    ship.setFuelProjection(dragPos);
+    ship.turnShip(ship.position.heading()+dragDiff.heading());
+    if (ship.inOrbit) {
+      ship.inOrbit = false;
+      ship.orbitPlanet.beingOrbited = false;
+      ship.orbitPlanet = null;
+    }
   }
 }
 
 public void mouseDragged() {
-  PVector currentDrag = new PVector(mouseX, mouseY);
-  dragDiff = currentDrag.copy().sub(ship.position);
-  dragPos = ship.position.copy().add(dragDiff);
-  ship.turnShip(ship.position.heading()+dragDiff.heading());
+  if (launch){
+    PVector currentDrag = new PVector(mouseX, mouseY);
+    dragDiff = currentDrag.copy().sub(ship.position);
+    dragPos = ship.position.copy().add(dragDiff);
+    ship.turnShip(ship.position.heading()+dragDiff.heading());
+    ship.setFuelProjection(dragPos);
+  }
 }
 
 public void mouseReleased() {
-  drag = false;
-  ship.pause(false);
-  ship.launch(dragPos);
-  orbitCount = 0;
-  dragPos = new PVector(ship.position.x, ship.position.y);
-  dragDiff = new PVector(ship.position.x, ship.position.y);
+  if (drag) {
+    drag = false;
+    ship.pause(false);
+    ship.launch(dragPos);
+    orbitCount = 0;
+    dragPos = new PVector(ship.position.x, ship.position.y);
+    dragDiff = new PVector(ship.position.x, ship.position.y);
+  }
+}
+
+void keyPressed() {
+  if (key == CODED) {
+    if (keyCode == SHIFT) {
+      launch = true;
+    }
+  }
+}
+
+void keyReleased() {
+  if (key == CODED) {
+    if (keyCode == SHIFT) {
+      launch = false;
+    }
+  }
 }

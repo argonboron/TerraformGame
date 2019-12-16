@@ -1,8 +1,8 @@
 public class Ship { //<>//
   PVector acceleration, velocity, position, gravity, drag, origin, force, blast, thrust;
   PShape ship;
-  float mass, orientation, orbitAngle, fuel;
-  boolean pause, inOrbit, clockwise;
+  float mass, orientation, orbitAngle, fuel, fuelProjectVal;
+  boolean pause, inOrbit, clockwise, fuelProject;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
   Planet orbitPlanet;
   int DisplayHeight = 1000;
@@ -36,6 +36,13 @@ public class Ship { //<>//
     fill(215, 100, 0);
     rect(DisplayHeight-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
     stroke(0);
+    
+    if (fuelProject) {
+    stroke(color(225, 194, 153));
+    fill(225, 194, 153);
+    rect(DisplayHeight-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
+    stroke(0);
+    }
   }
 
   public void pause(boolean val) {
@@ -68,8 +75,10 @@ public class Ship { //<>//
   }
 
   void applyGravity(Planet planet) {
-    PVector distanceVec = planet.position.copy().sub(position);
-    float G = 0.1;
+    PVector newPos = this.position.copy().mult(10e8);
+    PVector planetPos =  planet.position.copy().mult(10e8);
+    PVector distanceVec = planetPos.sub(newPos);
+    float G = 10e-5;
     float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 2));
     gravity.add(distanceVec.mult(gravForce));
   }
@@ -86,27 +95,29 @@ public class Ship { //<>//
 
   //Integrate function
   void integrate() {
-    velocity.add(acceleration);
-    velocity.div(30);
-    orientation = velocity.heading();
-    position.add(velocity);
     force.add(gravity);
     gravity = new PVector();
     acceleration = force.copy().div(mass);
+    force = new PVector();
+    velocity.add(acceleration);
+    orientation = velocity.heading();
+    position.add(velocity.copy().div(1500));
   }
 
 
   void launch(PVector dragVec) {
     PVector thrust = position.copy().sub(dragVec);
-    force = thrust.mult(2);
+    force = thrust.mult(9);
     gravity = new PVector();
-    println(thrust.mag() + "!");
-    fuel = fuel-(thrust.mag()/2);
+    velocity = new PVector();
+    fuel = fuel-(thrust.mag()/20);
+    fuelProject = false;
   }
-
-  ////Getter for Position
-  PVector getPosition() {
-    return position;
+  
+  boolean setFuelProjection(PVector dragVec) {
+    fuelProject = true;
+    fuelProjectVal = position.copy().sub(dragVec).mult(9).mag()/20;
+    return (fuel -fuelProjectVal) > 0;
   }
 
   public Ship() {
@@ -117,6 +128,6 @@ public class Ship { //<>//
     this.force = new PVector();
     this.fuel = 1000;
     gravity = new PVector();
-    mass = 10;
+    mass = 1;
   }
 }
