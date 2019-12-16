@@ -1,10 +1,11 @@
 public class Ship { //<>//
   PVector acceleration, velocity, position, gravity, drag, origin, force, blast, thrust;
   PShape ship;
-  float mass, orientation, orbitAngle;
+  float mass, orientation, orbitAngle, fuel;
   boolean pause, inOrbit, clockwise;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
   Planet orbitPlanet;
+  int DisplayHeight = 1000;
 
   void display() {  
     if (!pause && !inOrbit) {
@@ -26,6 +27,15 @@ public class Ship { //<>//
     square(0, 0, 15);
     pop();
     fill(0);
+    
+    //Fuel
+    stroke(255);
+    rect(DisplayHeight-50, DisplayHeight-120, 30, 100);
+    stroke(0);
+    stroke(color(215, 100, 0));
+    fill(215, 100, 0);
+    rect(DisplayHeight-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
+    stroke(0);
   }
 
   public void pause(boolean val) {
@@ -59,7 +69,7 @@ public class Ship { //<>//
 
   void applyGravity(Planet planet) {
     PVector distanceVec = planet.position.copy().sub(position);
-    float G = 100;
+    float G = 0.1;
     float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 2));
     gravity.add(distanceVec.mult(gravForce));
   }
@@ -74,12 +84,12 @@ public class Ship { //<>//
   }
 
 
-  ////Integrate function
+  //Integrate function
   void integrate() {
     velocity.add(acceleration);
-    velocity.normalize();
-    position.add(velocity);
+    velocity.div(30);
     orientation = velocity.heading();
+    position.add(velocity);
     force.add(gravity);
     gravity = new PVector();
     acceleration = force.copy().div(mass);
@@ -88,8 +98,10 @@ public class Ship { //<>//
 
   void launch(PVector dragVec) {
     PVector thrust = position.copy().sub(dragVec);
-    force = thrust;
+    force = thrust.mult(2);
     gravity = new PVector();
+    println(thrust.mag() + "!");
+    fuel = fuel-(thrust.mag()/2);
   }
 
   ////Getter for Position
@@ -98,11 +110,12 @@ public class Ship { //<>//
   }
 
   public Ship() {
-    this.position = new PVector(displayHeight/2, displayHeight/2+300);
+    this.position = new PVector(DisplayHeight/2, DisplayHeight/2+300);
     this.velocity = new PVector();
     this.acceleration = new PVector();
     this.thrust = new PVector();
     this.force = new PVector();
+    this.fuel = 1000;
     gravity = new PVector();
     mass = 10;
   }

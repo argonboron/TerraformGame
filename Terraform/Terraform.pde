@@ -7,14 +7,15 @@ int level, speed, orbitCount;
 boolean gameOver, battle, drag, orbit;
 PVector dragPos, dragDiff, dragOrigin;
 PShape line;
+int DisplayHeight = 1000;
 
 
 public void setup() {
-  size(displayHeight, displayHeight);
+  size(1000, 1000);
   background(0);
   ship = new Ship();
   project = new Projection();
-  //planets.add(new Planet(1));
+  planets.add(new Planet(1));
   planets.add(new Planet(2));
   gameOver = false;
   orbitCount = 0;
@@ -32,11 +33,11 @@ public void draw() {
       planets.get(i).display();
       if (!ship.inOrbit) {
         if ((planets.get(i).position.dist(ship.position) < planets.get(i).orbitDiameter) && !drag) {
-          if (orbitCount >100) {
-            //ship.orbitPlanet = planets.get(i);
-            //ship.inOrbit = true;
-            //planets.get(i).beingOrbited = true;
-            //ship.orbit(planets.get(i).size*1.1, planets.get(i).position);
+          if (orbitCount > 200) {
+            ship.orbitPlanet = planets.get(i);
+            ship.inOrbit = true;
+            planets.get(i).beingOrbited = true;
+            ship.orbit(planets.get(i).size*1.1, planets.get(i).position);
           } else {
             orbitCount++;
           }
@@ -59,13 +60,13 @@ public void draw() {
       project.display(planets, dragPos);
     }
     ship.display();
-    if (ship.position.y > displayHeight || ship.position.x > displayHeight || ship.position.x < 0) {
+    if (ship.position.y > DisplayHeight || ship.position.x > DisplayHeight || ship.position.x < 0) {
       gameOver = true;
     }
   } else {
     textSize(40);
     fill(255);
-    text("Game over!", displayHeight/2-105, displayHeight/2-50);
+    text("Game over!", DisplayHeight/2-105, DisplayHeight/2-50);
     fill(0);
   }
 }
