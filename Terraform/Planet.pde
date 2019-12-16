@@ -1,7 +1,7 @@
 public class Planet {
   boolean dead, beingOrbited;
   PVector position;
-  float mass;
+  float mass, lifeLimit;
   int size, lifeForce, orbitDiameter, gravitationalPull;
   int DisplayHeight = 1000;
   PImage p0, p1, p2, p3, p4;
@@ -13,11 +13,11 @@ public class Planet {
     if (beingOrbited && dead) {
       lifeForce++;
     }
-    if (lifeForce >= 500) {
+    if (lifeForce >= lifeLimit) {
       dead = false;
     }
     push();
-    if (lifeForce < 500/5) {
+    if (lifeForce < lifeLimit/5) {
       image(p0, position.x-(size/2), position.y-(size/2));
     } else if (lifeForce < (500/5)*2) {
       image(p1, position.x-(size/2), position.y-(size/2));
@@ -28,7 +28,7 @@ public class Planet {
     } else {
       image(p4, position.x-(size/2), position.y-(size/2));
     }
-    float num = (lifeForce/500.0)*255.0;
+    float num = (lifeForce/lifeLimit)*255.0;
     if (num > 255) {
       num = 255;
     }
@@ -36,7 +36,7 @@ public class Planet {
     fill(200);
     rect(position.x-size/2, position.y+size/1.5, size, 5);
     fill(0);
-    float life = lifeForce/500.0*size;
+    float life = lifeForce/lifeLimit*size;
     if (life > size) {
       life = size;
     }
@@ -56,6 +56,7 @@ public class Planet {
     }
     mass = 1.0e16 * pow(size/50, 3);
     lifeForce = 0;
+    lifeLimit = size*5.0;
     dead = true;
     orbitDiameter = size*2;
     gravitationalPull = (size*2);

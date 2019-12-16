@@ -2,10 +2,12 @@ public class Ship { //<>//
   PVector acceleration, velocity, position, gravity, drag, origin, force, blast, thrust;
   PShape ship;
   float mass, orientation, orbitAngle, fuel, fuelProjectVal;
-  boolean pause, inOrbit, clockwise, fuelProject;
+  boolean pause, inOrbit, clockwise, fuelProject, lifeSprite;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
   Planet orbitPlanet;
   int DisplayHeight = 1000;
+  int size, showBlast, lifeFrame;
+  PImage shipImg, blastImg, lifeImg1, lifeImg2;
 
   void display() {  
     if (!pause && !inOrbit) {
@@ -22,9 +24,23 @@ public class Ship { //<>//
     push();
     rectMode(CENTER);
     translate(position.x, position.y);
-    rotate(orientation);
-    fill(260, 100, 40);
-    square(0, 0, 15);
+    rotate(orientation-4.71239);
+    if (showBlast > 0 && !inOrbit) {
+      image(blastImg, -15, -15);
+      showBlast--;
+    } else if (!inOrbit) {
+      image(shipImg, -15, -15);
+    } else {
+      lifeFrame++;
+      if (lifeFrame%4==0) {
+        lifeSprite = !lifeSprite;
+      }
+      if (lifeSprite) {
+        image(lifeImg1, -15, -15);
+      } else {
+        image(lifeImg2, -15, -15);
+      }
+    }
     pop();
     fill(0);
     
@@ -89,7 +105,7 @@ public class Ship { //<>//
   }
 
   void turnShip(float heading) {
-    orientation = heading;
+    orientation = heading+2;
   }
 
 
@@ -112,6 +128,7 @@ public class Ship { //<>//
     velocity = new PVector();
     fuel = fuel-(thrust.mag()/20);
     fuelProject = false;
+    showBlast = 50;
   }
   
   boolean setFuelProjection(PVector dragVec) {
@@ -128,6 +145,15 @@ public class Ship { //<>//
     this.force = new PVector();
     this.fuel = 1000;
     gravity = new PVector();
+    size = 40;
     mass = 1;
+    shipImg = loadImage("ship.png");
+    blastImg = loadImage("blast.png");
+    lifeImg1 = loadImage("life1.png");
+    lifeImg2 = loadImage("life2.png");
+    lifeImg1.resize(size, 101);
+    lifeImg2.resize(size, 101);
+    shipImg.resize(size, size);
+    blastImg.resize(size, size);
   }
 }
