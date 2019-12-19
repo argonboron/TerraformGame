@@ -6,6 +6,7 @@ public class Ship { //<>//
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
   Planet orbitPlanet;
   int DisplayHeight = 1000;
+  int DisplayWidth = 1800;
   int size, showBlast, lifeFrame;
   PImage shipImg, blastImg, lifeImg1, lifeImg2;
 
@@ -46,18 +47,18 @@ public class Ship { //<>//
     
     //Fuel
     stroke(255);
-    rect(DisplayHeight-50, DisplayHeight-120, 30, 100);
+    rect(DisplayWidth-50, DisplayHeight-120, 30, 100);
     stroke(0);
     stroke(color(215, 100, 0));
     fill(215, 100, 0);
-    rect(DisplayHeight-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
+    rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
     stroke(0);
     
     if (fuelProject) {
-    stroke(color(225, 194, 153));
-    fill(225, 194, 153);
-    rect(DisplayHeight-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
-    stroke(0);
+      stroke(color(225, 194, 153));
+      fill(225, 194, 153);
+      rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
+      stroke(0);
     }
   }
 

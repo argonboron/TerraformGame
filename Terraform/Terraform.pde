@@ -9,10 +9,11 @@ PVector dragPos, dragDiff, dragOrigin;
 PShape line;
 PImage bg;
 int DisplayHeight = 1000;
+int DisplayWidth = 1800;
 
 
 public void setup() {
-  size(1000, 1000);
+  size(1800, 1000);
   background(0);
   ship = new Ship();
   project = new Projection();
@@ -26,6 +27,7 @@ public void setup() {
   dragPos = new PVector(ship.position.x, ship.position.y);
   drag = false;
   bg = loadImage("background.png");
+  bg.resize(1800, 1000);
 }
 
 public void draw() {
@@ -33,14 +35,17 @@ public void draw() {
   if (!gameOver) {
     for (int i = 0; i < planets.size(); i++) {
       planets.get(i).display();
+      if (ship.position.dist(planets.get(i).position) < planets.get(i).gravitationalPull){
+        ship.applyGravity(planets.get(i));
+      }
       if (!ship.inOrbit) {
         if ((planets.get(i).position.dist(ship.position) < planets.get(i).orbitDiameter) && !drag) {
-          if (orbitCount > 200) {
+          if (orbitCount > 200 && planets.get(i).dead) {
             ship.orbitPlanet = planets.get(i);
             ship.inOrbit = true;
             planets.get(i).beingOrbited = true;
             ship.orbit(planets.get(i).size*1.1, planets.get(i).position);
-          } else {
+          } else if (planets.get(i).dead) {
             orbitCount++;
           }
           if (planets.get(i).position.dist(ship.position) < (planets.get(i).size/2)+7.5 && (!ship.pause)) {
@@ -49,7 +54,6 @@ public void draw() {
         } else {
           planets.get(i).beingOrbited = false;
         }
-        ship.applyGravity(planets.get(i));
       } else if (ship.orbitPlanet.equals(planets.get(i))) {
         ship.continueOrbit(planets.get(i).size*1.1, planets.get(i).position);
       }
@@ -62,13 +66,13 @@ public void draw() {
       project.display(planets, dragPos);
     }
     ship.display();
-    if (ship.position.y > DisplayHeight || ship.position.x > DisplayHeight || ship.position.x < 0) {
+    if (ship.position.y > DisplayHeight || ship.position.x > DisplayWidth || ship.position.x < 0) {
       gameOver = true;
     }
   } else {
     textSize(40);
     fill(255);
-    text("Game over!", DisplayHeight/2-105, DisplayHeight/2-50);
+    text("Game over!", DisplayWidth/2-105, DisplayHeight/2-50);
     fill(0);
   }
 }
@@ -91,7 +95,7 @@ public void mousePressed() {
 }
 
 public void mouseDragged() {
-  if (launch){
+  if (drag){
     PVector currentDrag = new PVector(mouseX, mouseY);
     dragDiff = currentDrag.copy().sub(ship.position);
     dragPos = ship.position.copy().add(dragDiff);

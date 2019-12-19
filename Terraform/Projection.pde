@@ -13,7 +13,9 @@ public class Projection {
     invisShip.launch(potential);
   outer: for (int j = 0; j < (abs(potential.mag())/4); j++) {
       for (Planet planet : planets) {
-        invisShip.applyGravity(planet);
+        if (invisShip.position.dist(planet.position) < planet.gravitationalPull){
+          invisShip.applyGravity(planet);
+        }
         if (planet.position.dist(invisShip.position) < planet.size/2) {
           break outer;
         }
