@@ -1,6 +1,5 @@
 public class Ship { //<>//
   PVector acceleration, velocity, position, gravity, drag, origin, force, blast, thrust;
-  PShape ship;
   float mass, orientation, orbitAngle, fuel, fuelProjectVal;
   boolean pause, inOrbit, clockwise, fuelProject, lifeSprite;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
@@ -46,20 +45,20 @@ public class Ship { //<>//
     fill(0);
     
     //Fuel
-    stroke(255);
-    rect(DisplayWidth-50, DisplayHeight-120, 30, 100);
-    stroke(0);
-    stroke(color(215, 100, 0));
-    fill(215, 100, 0);
-    rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
-    stroke(0);
+    //stroke(255);
+    //rect(DisplayWidth-50, DisplayHeight-120, 30, 100);
+    //stroke(0);
+    //stroke(color(215, 100, 0));
+    //fill(215, 100, 0);
+    //rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
+    //stroke(0);
     
-    if (fuelProject) {
-      stroke(color(225, 194, 153));
-      fill(225, 194, 153);
-      rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
-      stroke(0);
-    }
+    //if (fuelProject) {
+    //  stroke(color(225, 194, 153));
+    //  fill(225, 194, 153);
+    //  rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
+    //  stroke(0);
+    //}
   }
 
   public void pause(boolean val) {
@@ -122,14 +121,18 @@ public class Ship { //<>//
   }
 
 
-  void launch(PVector dragVec) {
+  void launchShip(PVector dragVec) {
     PVector thrust = position.copy().sub(dragVec);
     force = thrust.mult(9);
+    println(force);
     gravity = new PVector();
     velocity = new PVector();
     fuel = fuel-(thrust.mag()/20);
     fuelProject = false;
     showBlast = 50;
+    if (orbitPlanet != null) {
+      orbitPlanet.orbitCount = 0;
+    }
   }
   
   boolean setFuelProjection(PVector dragVec) {
@@ -139,7 +142,7 @@ public class Ship { //<>//
   }
 
   public Ship() {
-    this.position = new PVector(DisplayHeight/2, DisplayHeight/2+300);
+    this.position = new PVector(150, 500);
     this.velocity = new PVector();
     this.acceleration = new PVector();
     this.thrust = new PVector();

@@ -2,7 +2,7 @@ public class Planet {
   boolean dead, beingOrbited;
   PVector position;
   float mass, lifeLimit, orbitDiameter;
-  int size, lifeForce,  gravitationalPull;
+  int size, lifeForce, gravitationalPull, orbitCount;
   int DisplayHeight = 1000;
   PImage p0, p1, p2, p3, p4;
 
@@ -10,8 +10,12 @@ public class Planet {
     if (beingOrbited && dead) {
       lifeForce++;
     }
-    if (lifeForce >= lifeLimit) {
+    if (lifeForce >= lifeLimit && dead) {
       dead = false;
+      level.setAlive(true);
+    }
+    if (lifeForce == 0) {
+      dead = true;
     }
     push();
     //ellipseMode(CENTER);
@@ -20,13 +24,13 @@ public class Planet {
     //fill(0, 40, 200, 30);
     //ellipse(position.x, position.y, orbitDiameter*2, orbitDiameter*2);
     //fill(0);
-    if (lifeForce < lifeLimit/4) {
+    if (lifeForce < lifeLimit/4 && dead) {
       image(p0, position.x-(size/2), position.y-(size/2));
-    } else if (lifeForce < (lifeLimit/2)) {
+    } else if (lifeForce < (lifeLimit/2) && dead) {
       image(p1, position.x-(size/2), position.y-(size/2));
-    } else if (lifeForce < (lifeLimit/4)*3) {
+    } else if (lifeForce < (lifeLimit/4)*3 && dead) {
       image(p2, position.x-(size/2), position.y-(size/2));
-    } else if (lifeForce < (lifeLimit)) {
+    } else if (lifeForce < (lifeLimit) && dead) {
       image(p3, position.x-(size/2), position.y-(size/2));
     } else {
       image(p4, position.x-(size/2), position.y-(size/2));
@@ -49,14 +53,24 @@ public class Planet {
     return position.y-size > DisplayHeight;
   }
 
-  public Planet(int i) {
-    if (i==1) {
-      position = new PVector((DisplayWidth/2)+350, DisplayHeight/2+100);
-      size = 90;
-    } else {
-      position = new PVector((DisplayWidth/2)-200, DisplayHeight/2-200);
-      size = 150;
+  void increaseOrbit() {
+    orbitCount++;
+  }
+
+  void hit() {
+    lifeForce = lifeForce-((int) lifeLimit/5);
+    if (lifeForce < 0) {
+      lifeForce = 0;
+      if (!dead) {
+        dead = true;
+        level.setAlive(false);
+      }
     }
+  }
+
+  public Planet(PVector position, int size) {
+    this.position = position;
+    this.size = size;
     mass = 1.0e16 * size/10;
     lifeForce = 0;
     lifeLimit = size*5.0;

@@ -10,8 +10,8 @@ public class Projection {
     invisShip.force = ship.force.copy();
     invisShip.gravity = ship.gravity.copy();
     lineCoords.clear();
-    invisShip.launch(potential);
-  outer: for (int j = 0; j < (abs(potential.mag())/4); j++) {
+    invisShip.launchShip(potential);
+  outer: for (int j = 0; j < (abs(potential.mag())/4*60); j++) {
       for (Planet planet : planets) {
         if (invisShip.position.dist(planet.position) < planet.gravitationalPull){
           invisShip.applyGravity(planet);
