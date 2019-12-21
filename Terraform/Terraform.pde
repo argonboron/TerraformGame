@@ -5,7 +5,7 @@ Ship ship;
 Level level;
 Projection project;
 int speed;
-boolean gameOver, battle, drag, orbit, launch;
+boolean gameOver, battle, drag, orbit, launch, meteor;
 PVector dragDiff, mousePos;
 PShape line;
 PImage bg;
@@ -14,15 +14,17 @@ int DisplayWidth = 1800;
 float scaleFactor = 1.0;
 float translateX = 0.0;
 float translateY = 0.0;
+Wormhole wormhole;
 
 
 public void setup() {
   size(1800, 1000);
   background(0);
-  ship = new Ship();
+  ship = new Ship(true);
   project = new Projection();
   level = new Level();
   planets = level.getPlanets();
+  wormhole = level.getWormhole();
   gameOver = false;
   battle = false;
   dragDiff = new PVector(ship.position.x, ship.position.y);
@@ -30,6 +32,7 @@ public void setup() {
   drag = false;
   bg = loadImage("background.png");
   bg.resize(1800, 1000);
+  meteor = false;
 }
 
 public void draw() {
@@ -41,9 +44,11 @@ public void draw() {
     scale(scaleFactor);
     for (int i = 0; i < planets.size(); i++) {
       planets.get(i).display();
+      
       if (ship.position.dist(planets.get(i).position) < planets.get(i).gravitationalPull) {
         ship.applyGravity(planets.get(i));
       }
+      
       if (!ship.inOrbit) {
         if ((planets.get(i).position.dist(ship.position) < planets.get(i).orbitDiameter) && !drag) {
           if (planets.get(i).orbitCount > 200 && planets.get(i).dead) {
@@ -72,12 +77,22 @@ public void draw() {
       pop();
       project.display(planets, new PVector(mousePos.x, mousePos.y));
     }
+    wormhole.display();
     ship.display();
-    
+    if (level.alive() >= planets.size()/2+1) {
+      if (!meteor) {
+        asteroids = level.meteorShower();
+        meteor = true;
+      }
+    }
     for (int i = 0; i < asteroids.size(); i++) {
       if (!asteroids.get(i).display()) {
         asteroids.remove(i);
         i--;
+      } else{
+        if (asteroids.get(i).position.dist(ship.position) < ship.size/2+asteroids.get(i).size/3) {
+          gameOver = true;
+        }
       }
     }
     popMatrix();
@@ -91,7 +106,14 @@ public void draw() {
       gameOver = true;
     }
     if (level.alivePlanets == planets.size()) {
+      wormhole.setVisible(true);
+    }
+    if (wormhole.visible && wormhole.position.dist(ship.position) < 83) {
+      println(wormhole.position.dist(ship.position) + " " + wormhole.size);
+      planets.clear();
+      asteroids.clear();
       planets = level.newLevel();
+      wormhole = level.getWormhole();
     }
   } else {
     textSize(40);
@@ -117,8 +139,8 @@ public void mousePressed() {
       ship.orbitPlanet = null;
     }
   } else {
-    asteroids.add(new Asteroid());
-    //level.newLevel();
+    level.newLevel();
+    asteroids.clear();
   }
 }
 

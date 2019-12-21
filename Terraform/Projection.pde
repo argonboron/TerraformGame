@@ -35,7 +35,7 @@ public class Projection {
   }
 
   public Projection() {
-    invisShip = new Ship();
+    invisShip = new Ship(false);
     invisShip.mass = ship.mass;
     invisShip.position = ship.position.copy();
     invisShip.velocity = ship.velocity.copy();

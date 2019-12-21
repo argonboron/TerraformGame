@@ -1,9 +1,10 @@
 public class Planet {
-  boolean dead, beingOrbited;
+  boolean dead, beingOrbited, tint;
   PVector position;
   float mass, lifeLimit, orbitDiameter;
-  int size, lifeForce, gravitationalPull, orbitCount;
+  int size, lifeForce, gravitationalPull, orbitCount, r, g, b;
   int DisplayHeight = 1000;
+  
   PImage p0, p1, p2, p3, p4;
 
   boolean display() {
@@ -13,6 +14,7 @@ public class Planet {
     if (lifeForce >= lifeLimit && dead) {
       dead = false;
       level.setAlive(true);
+      ship.addFuel(size*2.2);
     }
     if (lifeForce == 0) {
       dead = true;
@@ -24,6 +26,9 @@ public class Planet {
     //fill(0, 40, 200, 30);
     //ellipse(position.x, position.y, orbitDiameter*2, orbitDiameter*2);
     //fill(0);
+    if (tint) {
+      tint(r, g, b);
+    }
     if (lifeForce < lifeLimit/4 && dead) {
       image(p0, position.x-(size/2), position.y-(size/2));
     } else if (lifeForce < (lifeLimit/2) && dead) {
@@ -75,6 +80,10 @@ public class Planet {
     lifeForce = 0;
     lifeLimit = size*5.0;
     dead = true;
+    tint = random(1,10) > 7;
+    r = (int)random(0, 255);
+    g = (int)random(0, 255);
+    b = (int)random(0, 255);
     orbitDiameter = size+70;
     gravitationalPull = (size*3);
     p0 = loadImage("planet0.png");
