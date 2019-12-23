@@ -1,25 +1,29 @@
 public class Ship { //<>//
-  PVector acceleration, velocity, position, gravity, drag, force, thrust;
-  float mass, orientation, orbitAngle, fuel, fuelProjectVal;
-  boolean pause, inOrbit, clockwise, fuelProject, lifeSprite, visible;
-  ArrayList<PVector> lineCoords = new ArrayList<PVector>();
+  PVector acceleration, velocity, position, gravity, drag, force;
+  float mass, orientation, orbitAngle, fuel, fuelProjectVal, laserCharge, fireNum;
+  boolean pause, inOrbit, clockwise, fuelProject, lifeSprite, visible, fire, laserChargeBool;
+  ArrayList<PVector> beamPoints = new ArrayList<PVector>();
   Planet orbitPlanet;
   int DisplayHeight = 1000;
   int DisplayWidth = 1800;
   int size, showBlast, lifeFrame;
   PImage shipImg, blastImg, lifeImg1, lifeImg2;
 
-  void display() {  
-    if (!pause && !inOrbit) {
-      integrate();
-      orbitAngle = 0;
-    }
-    PVector lineCoord = position.copy();
-    if (lineCoords.size()>200) {
-      lineCoords.remove(0);
-    }
-    if (!pause && ((int) random(0, 2)==1)) {
-      lineCoords.add(lineCoord);
+  void display() { 
+    if (!pause) {
+      if (laserChargeBool && fireNum == 0) {
+        laserCharge++;
+      } else {
+        laserCharge = 0;
+      }
+      if (laserCharge == 100) {
+        fireNum = 50;
+        fire();
+      }
+      if (!inOrbit) {
+        integrate(); 
+        orbitAngle = 0;
+      }
     }
     push();
     rectMode(CENTER);
@@ -42,27 +46,43 @@ public class Ship { //<>//
       }
     }
     pop();
-    fill(0);
 
-    //Fuel
-    stroke(255);
-    rect(DisplayWidth-50, DisplayHeight-120, 30, 100);
-    stroke(0);
-    stroke(color(215, 100, 0));
-    fill(215, 100, 0);
-    rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuel/10)-2);
-    stroke(0);
-
-    if (fuelProject) {
-      stroke(color(225, 194, 153));
-      fill(225, 194, 153);
-      rect(DisplayWidth-49, (DisplayHeight-19)-(fuel/10), 28, (fuelProjectVal/10));
-      stroke(0);
-    }
   }
 
   public void pause(boolean val) {
     pause = val;
+  }
+
+  void fire() {
+    PVector beamVector = new PVector(mouseX, mouseY).sub(position);
+    beamVector.normalize();
+    println(beamVector);
+    beamPoints.add(position.copy());
+  beamLoop: 
+    for (int i = 0; i < 9000; i++) {
+      PVector newBeam = beamPoints.get(i).copy().add(beamVector);
+      if (alien != null && newBeam.dist(alien.position) < alien.size/2) {
+        alien.dead = true;
+        break;
+      } else {
+        for (int j = 0; j < asteroids.size(); j++) {
+          if (newBeam.dist(asteroids.get(j).position) < asteroids.get(j).size/2) {
+            asteroids.remove(j);
+            break beamLoop;
+          }
+        }
+        for (int j = 0; j < planets.size(); j++) {
+          if (newBeam.dist(planets.get(j).position) < planets.get(j).size/2) {
+            break beamLoop;
+          }
+        }
+        if (newBeam.y > DisplayHeight || newBeam.x > DisplayWidth || newBeam.x < 0) {
+          break;
+        }
+      }
+      println(i);
+      beamPoints.add(newBeam);
+    }
   }
 
   public void orbit(float radius, PVector planetPos) {
@@ -120,10 +140,14 @@ public class Ship { //<>//
     position.add(velocity.copy().div(1500));
   }
 
+  void addLaser() {
+    laserCharge++;
+  }
+
 
   void launchShip(PVector dragVec) {
+    PVector thrust = position.copy().sub(dragVec);
     if (fuel-(thrust.mag()/20) > 0 || !visible) {
-      PVector thrust = position.copy().sub(dragVec);
       force = thrust.mult(15);
       gravity = new PVector();
       velocity = new PVector();
@@ -141,7 +165,7 @@ public class Ship { //<>//
     fuelProjectVal = position.copy().sub(dragVec).mult(9).mag()/30;
     return (fuel -fuelProjectVal) > 0;
   }
-  
+
   void addFuel(float add) {
     fuel += add;
   }
@@ -150,7 +174,6 @@ public class Ship { //<>//
     this.position = new PVector(150, 500);
     this.velocity = new PVector();
     this.acceleration = new PVector();
-    this.thrust = new PVector();
     this.force = new PVector();
     this.fuel = 1000;
     this.visible = visible;

@@ -32,7 +32,7 @@ public class Level {
       PVector randPos = new PVector(randX, randY);
       int count = 0;
       while (!reasonablySpaced(randPos, randSize)) {
-        randX = (int) random(200+randSize, 700-randSize);
+        randX = (int) random(350+randSize, 700-randSize);
         randY = (int) random(randSize*1.5, 1000-randSize*1.5);
         randPos = new PVector(randX, randY);
         count++;
@@ -95,6 +95,18 @@ public class Level {
     }
     return true;
   }
+  
+  PVector getOffset() {
+    float sumX = 0;
+    float sumY = 0;
+    for (Planet planet : planets) {
+      sumX+= planet.position.x;
+      sumY+=planet.position.y;
+    }
+    sumX = sumX/planets.size();
+    sumY = sumX/planets.size();
+    return new PVector(sumX, sumY).sub(new PVector(1000, 500));
+  }
 
   ArrayList<Planet> newLevel() {
     alivePlanets = 0;
@@ -112,6 +124,7 @@ public class Level {
       }
     }
     generateLevel();
+    alien = null;
     return planets;
   }
   

@@ -6,7 +6,6 @@ public class Projection {
     invisShip.position = ship.position.copy();
     invisShip.velocity = ship.velocity.copy();
     invisShip.acceleration = ship.acceleration.copy();
-    invisShip.thrust = ship.thrust.copy();
     invisShip.force = ship.force.copy();
     invisShip.gravity = ship.gravity.copy();
     lineCoords.clear();
@@ -16,7 +15,7 @@ public class Projection {
         if (invisShip.position.dist(planet.position) < planet.gravitationalPull){
           invisShip.applyGravity(planet);
         }
-        if (planet.position.dist(invisShip.position) < planet.size/2) {
+        if (planet.position.dist(invisShip.position) < (planet.size/2)+7.5) {
           break outer;
         }
       }
@@ -40,7 +39,6 @@ public class Projection {
     invisShip.position = ship.position.copy();
     invisShip.velocity = ship.velocity.copy();
     invisShip.acceleration = ship.acceleration.copy();
-    invisShip.thrust = ship.thrust.copy();
     invisShip.force = ship.force.copy();
     invisShip.gravity = ship.gravity.copy();
   }
