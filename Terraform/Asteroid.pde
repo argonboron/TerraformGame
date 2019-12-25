@@ -10,7 +10,7 @@ public class Asteroid {
   PImage asteroid1, asteroid2;
 
   boolean display() {  
-    if (!pause) {
+    if (!ship.pause) {
       for (Planet planet : planets) {
         if (this.position.dist(planet.position) < planet.gravitationalPull*2+size/4) {
           this.applyGravity(planet);
@@ -78,23 +78,23 @@ public class Asteroid {
   public Asteroid() {
     switch((int) random(1, 5)) {
     case 1:
-      this.position = new PVector(0, random(0, 1000));
+      this.position = new PVector(0, random(0, displayHeight));
       this.force = new PVector(6000, random(-1000, 1000));
       break;
     case 2:
-      this.position = new PVector(random(0, 1800), 0);
+      this.position = new PVector(random(0, displayWidth), 0);
       this.force = new PVector(random(-1000, 1000), 6000);
       break;
     case 3:
-      this.position = new PVector(random(0, 1800), 1000);
+      this.position = new PVector(random(0, displayWidth), 1000);
       this.force = new PVector(random(-1000, 1000), -6000);
       break;
     case 4:
-      this.position = new PVector(1800, random(0, 1000));
+      this.position = new PVector(1800, random(0, displayHeight));
       this.force = new PVector(-6000, random(-1000, 1000));
       break;
     }
-    this.force.div(5);
+    this.force.div(20);
     this.velocity = new PVector();
     frame = 0;
     this.acceleration = new PVector();
@@ -102,8 +102,8 @@ public class Asteroid {
     gravity = new PVector();
     size = (int) random (50, 80);
     mass = 1;
-    asteroid1 = loadImage("asteroid1.png");
-    asteroid2 = loadImage("asteroid2.png");
+    asteroid1 = loadImage("Data/asteroid1.png");
+    asteroid2 = loadImage("Data/asteroid2.png");
     asteroid1.resize(size, size);
     asteroid2.resize(size, size);
     planets = level.getPlanets();

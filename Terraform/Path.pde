@@ -1,19 +1,17 @@
 public class Path {
-  Alien self;
+  Alien self, ogAlien;
   int depth;
   PVector launch;
   Planet target;
   ArrayList<PVector> pathCoords = new ArrayList<PVector>();
 
   boolean check() {
-    self.position = alien.position.copy();
-    self.velocity = alien.velocity.copy();
-    self.acceleration = alien.acceleration.copy();
-    self.thrust = alien.thrust.copy();
-    self.force = alien.force.copy();
-    self.gravity = alien.gravity.copy();
-    //println(self.clockwise);
-    // println("LAUNCH - " + launch);
+    self.position = ogAlien.position.copy();
+    self.velocity = ogAlien.velocity.copy();
+    self.acceleration = ogAlien.acceleration.copy();
+    self.thrust = ogAlien.thrust.copy();
+    self.force = ogAlien.force.copy();
+    self.gravity = ogAlien.gravity.copy();
     self.launchAlien(launch);
     pathCoords.clear();
 
@@ -22,32 +20,20 @@ public class Path {
         if (self.position.dist(planet.position) < planet.gravitationalPull) {
           self.applyGravity(planet);
         }
-        if (alien.onPlanet) {
+        if (ogAlien.onPlanet) {
           if (self.position.dist(planet.position) < (planet.size/2)) {
-            //display();
-            // println("hit planet1");
             return planet.position.equals(target.position);
           }
         } else {
           if (self.position.dist(planet.position) < (planet.size/2)+7.5) {
-            //display();
-            //println("hit planet2");
             return planet.position.equals(target.position);
           }
         }
       }
-      //PVector oldPos = self.position.copy();
       PVector lineCoord = self.position.copy();
       pathCoords.add(lineCoord);
       self.integrate();
-      //if (oldPos.dist(target.position) > self.position.dist(target.position)) {
-      //  display();
-      //  println("wrong direction");
-      //  return false;
-      //}
     }
-    //this.display();
-    // println("couldnt find");
     return false;
   }
 
@@ -66,26 +52,24 @@ public class Path {
   }
 
   void changeMag(int num) {
-    //println("increase Mag");
     launch.setMag(launch.mag()+(num*55));
   }
 
   void clockwise() {
-   //println("change angle");
     launch.rotate(PI/8);
   }
 
   void anticlockwise() {
-    //println("change angle anti");
     launch.rotate((PI/8)*-1);
   }
 
-  public Path(PVector launch, int depth, Planet target) {
+  public Path(PVector launch, int depth, Planet target, Alien alien) {
     self = new Alien();
     launch.setMag(5000);
     this.launch = launch;
     this.depth = depth;
     this.target = target;
+    this.ogAlien = alien;
     self.mass = alien.mass;
     self.position = alien.position.copy();
     self.velocity = alien.velocity.copy();

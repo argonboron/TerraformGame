@@ -5,11 +5,11 @@ public class Planet {
   int size, lifeForce, gravitationalPull, orbitCount;
   int DisplayHeight = 1000;
   color c;
-  
+
   PImage p0, p1, p2, p3, p4;
 
   boolean display() {
-    if (beingOrbited && dead && !ship.pause) {
+    if (beingOrbited && lifeForce < lifeLimit && !ship.pause) {
       lifeForce++;
     }
     if (beingAttacked && lifeForce>0 && !ship.pause) {
@@ -17,19 +17,23 @@ public class Planet {
     }
     if (lifeForce >= lifeLimit && dead) {
       dead = false;
+      score+=size;
       level.setAlive(true);
       ship.addFuel(size*2.2);
     }
-    if (lifeForce == 0) {
+    if (lifeForce == 0 && !dead) {
       dead = true;
+      level.setAlive(false);
     }
     push();
-    //ellipseMode(CENTER);
-    //fill(0, 200, 40, 30);
-    //ellipse(position.x, position.y, gravitationalPull*2, gravitationalPull*2);
-    //fill(0, 40, 200, 30);
-    //ellipse(position.x, position.y, orbitDiameter*2, orbitDiameter*2);
-    //fill(0);
+    if (show) {
+      ellipseMode(CENTER);
+      fill(0, 200, 40, 50);
+      ellipse(position.x, position.y, gravitationalPull*2, gravitationalPull*2);
+      fill(0, 40, 200, 50);
+      ellipse(position.x, position.y, orbitDiameter*2, orbitDiameter*2);
+      fill(0);
+    }
     if (tint) {
       tint(c);
     }
@@ -84,17 +88,17 @@ public class Planet {
     lifeForce = 0;
     lifeLimit = size*5.0;
     dead = true;
-    tint = random(1,10) > 7;
+    tint = random(1, 10) > 7;
     colorMode(HSB, 100);
-    c = color(random(0,100), random(25, 95), 100);
+    c = color(random(0, 100), random(25, 95), 100);
     colorMode(RGB, 255);
     orbitDiameter = size+70;
     gravitationalPull = (size*3);
-    p0 = loadImage("planet0.png");
-    p1 = loadImage("planet1.png");
-    p2 = loadImage("planet2.png");
-    p3 = loadImage("planet3.png");
-    p4 = loadImage("planet4.png");
+    p0 = loadImage("Data/planet0.png");
+    p1 = loadImage("Data/planet1.png");
+    p2 = loadImage("Data/planet2.png");
+    p3 = loadImage("Data/planet3.png");
+    p4 = loadImage("Data/planet4.png");
     p0.resize(size, size);
     p1.resize(size, size);
     p2.resize(size, size);

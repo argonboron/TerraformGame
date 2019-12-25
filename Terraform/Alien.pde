@@ -1,11 +1,11 @@
-public class Alien { //<>//
+public class Alien { //<>// //<>// //<>//
   PVector acceleration, velocity, position, gravity, drag, force, thrust;
   float mass, orientation;
   boolean pause, onPlanet, clockwise, foundPath, searching, dead;
   ArrayList<PVector> lineCoords = new ArrayList<PVector>();
   Planet currentPlanet, target, lastPlanet;
-  int DisplayHeight = 1000;
-  int DisplayWidth = 1800;
+  int DisplayHeight = displayHeight;
+  int DisplayWidth = displayWidth;
   int size, mag, startOffLaunch, onPlanetCount;
   PImage fly, land, deadimg;
   Path path;
@@ -15,10 +15,11 @@ public class Alien { //<>//
     rectMode(CENTER);
     translate(position.x, position.y);  
     if (dead) {
-      currentPlanet.beingAttacked = false;
+      if (currentPlanet !=null) {
+        currentPlanet.beingAttacked = false;
+      }
       tint(99);
       image(deadimg, -15, -15);
-      velocity.normalize();
       for (Planet planet : planets) {
         if (position.dist(planet.position) < planet.gravitationalPull) {
           applyGravity(planet);
@@ -34,12 +35,14 @@ public class Alien { //<>//
       rotate(orientation-4.71239);
     } else {
       if (onPlanet) {
-        rotate(currentPlanet.position.copy().sub(this.position).heading()+4.71239);
-        image(land, -15, -15);
-        currentPlanet.beingAttacked = true;
-        onPlanetCount--;
-        if (onPlanetCount == 0 && (currentPlanet.lifeForce == 0 || ((position.dist(ship.position) < 180 && comingMyDirection()) || position.dist(ship.position) < 110))) {
-          startPath();
+        if (currentPlanet != null) {
+          rotate(currentPlanet.position.copy().sub(this.position).heading()+4.71239);
+          image(land, -15, -15);
+          currentPlanet.beingAttacked = true;
+          onPlanetCount--;
+          if (onPlanetCount <= 0 && (currentPlanet.lifeForce == 0 || ((position.dist(ship.position) < 180 && comingMyDirection()) || position.dist(ship.position) < 110))) {
+            startPath();
+          }
         }
       } else if ((!searching || startOffLaunch > 0) && !ship.pause && !dead) {
         for (Planet planet : planets) {
@@ -106,7 +109,7 @@ public class Alien { //<>//
     int maxValue = -100000;     
     int maxIndex = 0;
     for (int i = 0; i < planets.size(); i++) {
-      if (!planets.get(i).equals(lastPlanet) && !planets.get(i).equals(currentPlanet)) {
+      if (!planets.get(i).equals(lastPlanet) && !planets.get(i).equals(currentPlanet) && notAnotherTarget(planets.get(i))) {
         int currentMaxValue = planets.get(i).lifeForce*2 - ((int) this.position.dist(planets.get(i).position));     
         if (currentMaxValue > maxValue) {
           maxValue = currentMaxValue;
@@ -118,15 +121,24 @@ public class Alien { //<>//
       target = planets.get(maxIndex);
     }
   }
+  
+  boolean notAnotherTarget(Planet planet) {
+    for (Alien alien : aliens) {
+       if (planet.equals(alien.currentPlanet) || planet.equals(alien.target)) {
+         return false;
+       }
+    }
+    return true;
+  }
 
   void startPath() {
     if (!onPlanet) {
       PVector start = target.position.copy().sub(this.position);
       start.setMag(4000);
       int sightLength = (int) this.position.dist(target.position);
-      path = new Path(start, sightLength, target);
       clockwise = random(0, 10) > 5;
       mag = 0;
+      path = new Path(start, sightLength, target, this);
       foundPath = false;
       searching = true;
     } else {
@@ -152,13 +164,11 @@ public class Alien { //<>//
         path.anticlockwise();
       }
     } else {
-
       path.changeMag(mag);
       mag++;
     }
     foundPath = path.check();
     if (foundPath) {
-      //println("FOUND");
       this.launchAlien(path.launch);
       searching = false;
       foundPath = false;
@@ -172,7 +182,11 @@ public class Alien { //<>//
     PVector distanceVec = planetPos.sub(newPos);
     float G = 10e-5;
     float gravForce = (G * planet.mass * mass) / (pow(distanceVec.mag(), 2));
-    gravity.add(distanceVec.mult(gravForce));
+    if (dead) {
+      gravity.add((distanceVec.mult(gravForce)).div(100));
+    } else {
+      gravity.add(distanceVec.mult(gravForce));
+    }
   }
 
   //Setter for velocity
@@ -202,16 +216,16 @@ public class Alien { //<>//
   public Alien() {
     switch((int) random(1, 4)) {
     case 1:
-      this.position = new PVector(0, random(0, 1000));
+      this.position = new PVector(0, random(0, displayHeight));
       break;
     case 2:
-      this.position = new PVector(random(0, 1800), 0);
+      this.position = new PVector(random(0, displayWidth), 0);
       break;
     case 3:
-      this.position = new PVector(random(0, 1800), 1000);
+      this.position = new PVector(random(0, displayWidth), displayHeight);
       break;
     case 4:
-      this.position = new PVector(1800, random(0, 1000));
+      this.position = new PVector(displayWidth, random(0, displayHeight));
       break;
     }
     this.velocity = new PVector();
@@ -222,9 +236,9 @@ public class Alien { //<>//
     dead = false;
     size = 40;
     mass = 1;
-    fly = loadImage("alienFly.png");
-    land = loadImage("alienLand.png");
-    deadimg = loadImage("alienDead.png");
+    fly = loadImage("Data/alienFly.png");
+    land = loadImage("Data/alienLand.png");
+    deadimg = loadImage("Data/alienDead.png");
     fly.resize(size, size);
     land.resize(size, size);
     deadimg.resize(size, size);

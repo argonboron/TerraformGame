@@ -27,7 +27,7 @@ public class Wormhole {
     this.size = 90;
     mass = 1.0e16 * size/10;
     gravitationalPull = (size*3);
-    img = loadImage("wormhole.png");
+    img = loadImage("Data/wormhole.png");
     img.resize(size, size);
     this.visible = false;
   }

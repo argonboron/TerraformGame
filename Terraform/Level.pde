@@ -1,7 +1,9 @@
 public class Level {
-  int numberOfPlanets, repeat, repeatCount, level, alivePlanets;
+  int numberOfPlanets, repeat, repeatCount, level, alivePlanets, numOfAsteroids;
   private ArrayList<Planet> planets = new ArrayList<Planet>();
   private Wormhole wormhole;
+  int MIDDLE = (displayWidth/2)+100;
+  int MIDDLEVERT = (displayHeight/2);
 
   void generateLevel() {
     if (numberOfPlanets%2 != 0) {
@@ -9,31 +11,31 @@ public class Level {
         int chance = (int) random(1, 10);
         if (chance < 7) {
           int randSize = (int) random(90, 135);
-          planets.add(new Planet(new PVector(1000, 500), randSize));
+          planets.add(new Planet(new PVector(MIDDLE, MIDDLEVERT), randSize));
         } else {
           int randSize = (int) random(90, 135);
-          planets.add(new Planet(new PVector(1000, 500), randSize));
+          planets.add(new Planet(new PVector(MIDDLE, MIDDLEVERT), randSize));
           randSize = (int) random(75, 115);
-          planets.add(new Planet(new PVector(1000, (int) random(randSize*2, 300-randSize)), randSize));
+          planets.add(new Planet(new PVector(MIDDLE, (int) random(randSize*2, 300-randSize)), randSize));
           randSize = (int) random(75, 115);
-          planets.add(new Planet(new PVector(1000, (int) random(500+randSize, 1000 -(randSize*2))), randSize));
+          planets.add(new Planet(new PVector(MIDDLE, (int) random(MIDDLEVERT+randSize, MIDDLE -(randSize*2))), randSize));
         }
       } else {
         int randSize = (int) random(90, 135);
-        planets.add(new Planet(new PVector(1000, 500), randSize));
+        planets.add(new Planet(new PVector(MIDDLE, MIDDLEVERT), randSize));
       }
     }
     int madePlanets = planets.size();
     for (int i =0; i < (numberOfPlanets-madePlanets)/2; i++) {
       boolean found = true;
       int randSize = (int) random(75, 135);
-      int randX = (int) random(200+randSize, 700-randSize);
-      int randY = (int) random(randSize*1.5, 1000-randSize*1.5);
+      int randX = (int) random(300+randSize, (MIDDLE-200)-randSize);
+      int randY = (int) random(randSize*1.5, MIDDLE-randSize*1.5);
       PVector randPos = new PVector(randX, randY);
       int count = 0;
       while (!reasonablySpaced(randPos, randSize)) {
-        randX = (int) random(350+randSize, 700-randSize);
-        randY = (int) random(randSize*1.5, 1000-randSize*1.5);
+        randX = (int) random(350+randSize, (MIDDLE-200)-randSize);
+        randY = (int) random(randSize*1.5, MIDDLE-randSize*1.5);
         randPos = new PVector(randX, randY);
         count++;
         if (count > 80) {
@@ -60,8 +62,8 @@ public class Level {
   void symmetry() {
     int sizeNum = planets.size();
     for (int i = 0; i < sizeNum; i++) {
-      if (planets.get(i).position.x != 1000) {
-        int newX = 1000 + (1000-(int)planets.get(i).position.x);
+      if (planets.get(i).position.x != MIDDLE) {
+        int newX = MIDDLE + (MIDDLE-(int)planets.get(i).position.x);
         planets.add(new Planet(new PVector(newX, planets.get(i).position.y), planets.get(i).size));
       }
     }
@@ -75,16 +77,18 @@ public class Level {
     return alivePlanets;
   }
 
-  ArrayList<Asteroid> meteorShower() {
-    ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
-    for (int i =0; i < level+3; i++) {
-      asteroids.add(new Asteroid());
+  void meteorShower() {
+    if (numOfAsteroids > 0) {
+      if ((int) random (0, 100) == 12) {
+        asteroids.add(new Asteroid());
+        numOfAsteroids--;
+      }      
     }
-    return asteroids;
   }
+  
 
   boolean reasonablySpaced(PVector pos, int size) {
-    PVector shipPos = new PVector(200, 500);
+    PVector shipPos = new PVector(200, MIDDLEVERT);
     if (pos.dist(shipPos) <= size) {
       return false;
     }
@@ -105,15 +109,18 @@ public class Level {
     }
     sumX = sumX/planets.size();
     sumY = sumX/planets.size();
-    return new PVector(sumX, sumY).sub(new PVector(1000, 500));
+    return new PVector(sumX, sumY).sub(new PVector(MIDDLE, MIDDLEVERT));
   }
 
   ArrayList<Planet> newLevel() {
+    aliens.clear();
+    asteroids.clear();
     alivePlanets = 0;
     ship = new Ship(true);
     planets.clear();
     level++;
     repeatCount--;
+    meteor = ((int) random (1,3) == 2);
     if (repeatCount == 0) {
       if (numberOfPlanets == 12) {
         numberOfPlanets--;
@@ -124,15 +131,15 @@ public class Level {
       }
     }
     generateLevel();
-    alien = null;
+    meteor = false;
     return planets;
   }
   
   void generateWormhole(){
     PVector pos = new PVector((int)random(100, 1700), (int)random(100, 900));
     while (!reasonablySpaced(pos, 80)) {
-        int randX = (int)random(100, 1700);
-        int randY = (int)random(100, 900);
+        int randX = (int)random(100, displayWidth-100);
+        int randY = (int)random(100, displayHeight-100);
         pos = new PVector(randX, randY);
     }
     wormhole = new Wormhole(pos);
